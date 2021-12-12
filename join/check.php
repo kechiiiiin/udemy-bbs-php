@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 					<dt>ニックネーム</dt>
 					<dd><?php echo h($form['name']); ?></dd>
 					<dt>メールアドレス</dt>
-					<dd><?php echo h($form['email']); ?>></dd>
+					<dd><?php echo h($form['email']); ?></dd>
 					<dt>パスワード</dt>
 					<dd>
 						【表示されません】

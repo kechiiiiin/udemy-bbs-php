@@ -1,3 +1,26 @@
+<?php
+session_start();
+require('library.php');
+
+if (isset($_SESSION['id']) && isset($_SESSION['name'])) {
+    $id = $_SESSION['id'];
+    $name = $_SESSION['name'];
+} else {
+    header('Location: login.php');
+    exit();
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $message = filter_input(INPUT_POST, 'message', FILTER_SANITIZE_STRING);
+    postMessage($message, $id);
+    header('Location: index.php');
+    exit();
+}
+
+$posts = getPosts();
+
+?>
+
 <!DOCTYPE html>
 <html lang="ja">
 
@@ -19,7 +42,7 @@
         <div style="text-align: right"><a href="logout.php">ログアウト</a></div>
         <form action="" method="post">
             <dl>
-                <dt>○○さん、メッセージをどうぞ</dt>
+                <dt><?php echo h($name); ?>さん、メッセージをどうぞ</dt>
                 <dd>
                     <textarea name="message" cols="50" rows="5"></textarea>
                 </dd>
@@ -31,13 +54,19 @@
             </div>
         </form>
 
+        <?php foreach ($posts as $post) : ?>
         <div class="msg">
-            <img src="member_picture/" width="48" height="48" alt=""/>
-            <p>○○<span class="name">（○○）</span></p>
-            <p class="day"><a href="view.php?id=">2021/01/01 00:00:00</a>
-                [<a href="delete.php?id=" style="color: #F33;">削除</a>]
+            <?php if (!empty($post['picture'])): ?>
+                <img src="member_picture/<?php echo h($post['picture']); ?>" width="48" height="48" alt=""/>
+            <?php endif; ?>
+            <p><?php echo h($post['message']); ?><span class="name">（<?php echo h($post['name']); ?>）</span></p>
+            <p class="day"><a href="view.php?id=<?php echo h($post['id']); ?>"><?php echo h($post['created']); ?></a>
+                <?php if ($_SESSION['id'] === (int)$post['member_id']): ?>
+                    [<a href="delete.php?id=<?php echo h($post['id']); ?>" style="color: #F33;">削除</a>]
+                <?php endif; ?>
             </p>
         </div>
+        <?php endforeach; ?>
     </div>
 </div>
 </body>

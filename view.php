@@ -1,3 +1,25 @@
+<?php
+session_start();
+require('library.php');
+
+if (isset($_SESSION['id']) && isset($_SESSION['name'])) {
+    $id = $_SESSION['id'];
+    $name = $_SESSION['name'];
+} else {
+    header('Location: login.php');
+    exit();
+}
+
+$id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
+if (!$id) {
+    header('Location: index.php');
+    exit();
+}
+
+$post = getPost($id);
+
+?>
+
 <!DOCTYPE html>
 <html lang="ja">
 
@@ -17,14 +39,19 @@
     </div>
     <div id="content">
         <p>&laquo;<a href="index.php">一覧にもどる</a></p>
-        <div class="msg">
-            <img src="member_picture/" width="48" height="48" alt=""/>
-            <p>○○<span class="name">（○○）</span></p>
-            <p class="day"><a href="view.php?id=">2021/01/01 00:00:00</a>
-                [<a href="delete.php?id=" style="color: #F33;">削除</a>]
-            </p>
-        </div>
-        <p>その投稿は削除されたか、URLが間違えています</p>
+        <?php if (!empty($post)) : ?>
+            <div class="msg">
+                <?php if (!empty($post['picture'])): ?>
+                    <img src="member_picture/<?php echo h($post['picture']); ?>" width="48" height="48" alt=""/>
+                <?php endif; ?>
+                <p><?php echo h($post['message']); ?><span class="name">（<?php echo h($post['name']); ?>）</span></p>
+                <p class="day"><a href="view.php?id="><?php echo h($post['created']); ?></a>
+                    [<a href="delete.php?id=<?php echo h($post['id']); ?>" style="color: #F33;">削除</a>]
+                </p>
+            </div>
+        <?php else: ?>
+            <p>その投稿は削除されたか、URLが間違えています</p>
+        <?php endif; ?>
     </div>
 </div>
 </body>
